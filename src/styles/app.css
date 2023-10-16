@@ -1,0 +1,67 @@
+.btn {
+  @apply rounded px-4 py-2 font-bold;
+}
+
+.btn-primary {
+  @apply bg-blue-500 text-white;
+}
+
+.btn-primary:hover {
+  @apply bg-blue-700;
+}
+
+.btn-secondary {
+  @apply border border-blue-500  bg-transparent  text-blue-700;
+}
+
+.btn-secondary:hover {
+  @apply border-transparent bg-blue-500 text-white;
+}
+
+.canvas-bg {
+  background-color: #fff;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+#canvas-div {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.flex-container {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+
+  -ms-box-orient: horizontal;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -moz-flex;
+  display: -webkit-flex;
+  display: flex;
+}
+
+.x-label {
+  text-align: center;
+  padding-top: 0.5rem;
+}
+
+.left-label {
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.y-label {
+  text-wrap: nowrap;
+  font-size: 0.95vw;
+}
+
+.title {
+  padding-top: 0.5rem;
+  text-align: center;
+}

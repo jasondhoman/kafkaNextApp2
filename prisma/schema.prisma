@@ -1,0 +1,28 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+}
+
+model Post {
+  id        String       @id @default(uuid())
+  text      String
+  name      String
+  createdAt DateTime     @unique @default(now())
+  updatedAt DateTime     @unique @default(now())
+  source    PosterSource @default(RAW)
+}
+
+model SampleData {
+  id        String   @id @default(uuid())
+  points    Float[]
+  createdAt DateTime @unique @default(now())
+}
+
+enum PosterSource {
+  RAW
+  GITHUB
+}
