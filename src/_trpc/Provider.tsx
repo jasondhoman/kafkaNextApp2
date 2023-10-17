@@ -11,7 +11,7 @@ import {
 import { useState } from 'react';
 import { type AppRouter } from 'server/routers/_app';
 import superjson from 'superjson';
-import { trpc } from '@/client';
+import { trpc } from './client';
 
 function getEndingLink() {
   if (typeof window === 'undefined') {
