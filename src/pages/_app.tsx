@@ -3,7 +3,7 @@ import '../styles/app.css';
 import type { Session } from 'next-auth';
 import { getSession, SessionProvider } from 'next-auth/react';
 import type { AppType } from 'next/app';
-import { trpc } from 'utils/trpc';
+import { trpc } from 'utils/trpcPages';
 
 const app: AppType<{ session: Session | null }> = ({
   Component,

@@ -37,12 +37,6 @@ export const consume = async () => {
           connections.forEach((ws) => {
             ws.send(value.toString());
           });
-          // cb(value.toString());
-          // await prisma.sampleData.create({
-          //   data: {
-          //     points: JSON.parse(value.toString()),
-          //   },
-          // });
         } catch (err) {
           console.error(err);
         }
