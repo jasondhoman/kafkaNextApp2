@@ -34,8 +34,8 @@ export const consume = async () => {
       const value = message.value;
       if (value) {
         try {
-          connections.forEach((ws) => {
-            ws.send(value.toString());
+          connections.forEach((em) => {
+            em.emit('kafkaMessage', value.toString());
           });
         } catch (err) {
           console.error(err);

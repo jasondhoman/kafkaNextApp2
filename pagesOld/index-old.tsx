@@ -170,16 +170,6 @@ export default function KafkaPage() {
     webSocketEstablished.current = false;
     authenticated.current = false;
   }, []);
-  trpc.kafka.consume.useSubscription(undefined, {
-    onData(msg) {
-      console.log(msg);
-    },
-    onError(err) {
-      console.error('Subscription error:', err);
-      // we might have missed a message - invalidate cache
-      // utils.post.infinite.invalidate();
-    },
-  });
 
   // useEffect(() => {
   //   const pointArr: number[] = [];

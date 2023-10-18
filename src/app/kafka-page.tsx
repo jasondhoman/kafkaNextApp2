@@ -10,13 +10,11 @@ const CHART_SCALE = 2;
 const Y_AXIS_POINTS = 22;
 
 export default function KafkaPage() {
-  const webSocketEstablished = useRef(false);
-  const authenticated = useRef(false);
-  const ws = useRef<WebSocket | null>(null);
-  const id = useRef<string>('');
+  const consumeMessage = trpc.kafka.consumeMessage.useMutation();
 
   const [messagesRecieved, setMessagesRecieved] = useState(0);
   const [log, setLog] = useState<string[]>([]);
+  const [enabled, setEnabled] = useState(false);
   const [gridConfig, setGridConfig] = useState<GridConfig>({
     title: 'Realtime DAC Data',
     background: {
@@ -113,97 +111,45 @@ export default function KafkaPage() {
     [log.length],
   );
 
-  const establishWebSocket = useCallback(() => {
-    if (webSocketEstablished.current) {
-      return;
-    }
-
-    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-
-    const [host, port] = window.location.host.split(':');
-    ws.current = new WebSocket(`${protocol}://${host}:3002/kafka`);
-    // ws.current = new WebSocket(`ws://localhost:3005/stream-events`);
-    ws.current.addEventListener('open', () => {
-      webSocketEstablished.current = true;
-      logEvent('WebSocket connection established');
-    });
-
-    ws.current.addEventListener('close', () => {
-      webSocketEstablished.current = false;
-      authenticated.current = false;
-      logEvent('WebSocket connection closed');
-    });
-
-    ws.current.addEventListener('message', (event) => {
-      try {
-        console.log('message', event.data);
-        if (!authenticated.current) {
-          authenticated.current = true;
-          id.current = event.data as string;
-        } else {
-          const data = JSON.parse(event.data as string) as number[];
-          if (data) {
-            setMessagesRecieved((prev) => prev + 1);
-            setGridConfig((prev) => ({
-              ...prev,
-              data: [
-                ...data.map((y: number, index: number) =>
-                  plotXYPoints(index, y),
-                ),
-              ],
-            }));
-            logEvent(`Message recieved: ${data.length}`);
-          }
-        }
-      } catch (error) {
-        console.error(error);
+  trpc.kafka.messageTransmittor.useSubscription(undefined, {
+    onData(rawData) {
+      if (!enabled) return;
+      const data = JSON.parse(rawData) as number[];
+      if (data) {
+        setMessagesRecieved((prev) => prev + 1);
+        setGridConfig((prev) => ({
+          ...prev,
+          data: [
+            ...data.map((y: number, index: number) => plotXYPoints(index, y)),
+          ],
+        }));
+        logEvent(`Message recieved: ${data.length}`);
       }
-    });
-  }, [logEvent, plotXYPoints]);
-
-  const closeWebSocket = useCallback(() => {
-    if (!webSocketEstablished.current) {
-      return;
-    }
-    if (!ws.current) {
-      return;
-    }
-    ws.current.close();
-    webSocketEstablished.current = false;
-    authenticated.current = false;
-  }, []);
-  trpc.kafka.consume.useSubscription(undefined, {
-    onData(msg) {
-      console.log(msg);
-    },
-    onError(err) {
-      console.error('Subscription error:', err);
-      // we might have missed a message - invalidate cache
-      // utils.post.infinite.invalidate();
     },
   });
 
-  // useEffect(() => {
-  //   const pointArr: number[] = [];
-  //   let amp = 0.01;
-  //   while (pointArr.length < 1000) {
-  //     pointArr.push(amp);
-  //     amp += 0.01;
-  //     if (amp > 10) amp = -10;
-  //   }
-
-  //   gridConfig.data = [...pointArr.map((y, index) => plotXYPoints(index, y))];
-  //   console.log(gridConfig.data);
-  // }, [gridConfig, plotXYPoints]);
+  const handleMessageConsumer = (start: boolean) => {
+    setEnabled(start);
+    consumeMessage.mutate({ start });
+  };
 
   return (
     <div>
+      {messagesRecieved}
       <Chart config={gridConfig} />
       <div>
-        <button className="btn btn-secondary m-3" onClick={closeWebSocket}>
+        <button
+          className="btn btn-secondary m-3"
+          disabled={!enabled}
+          onClick={() => handleMessageConsumer(false)}
+        >
           Close WebSocket
         </button>
-        <button className="btn btn-primary" onClick={establishWebSocket}>
+        <button
+          className="btn btn-secondary m-3"
+          disabled={enabled}
+          onClick={() => handleMessageConsumer(true)}
+        >
           Open WebSocket
         </button>
       </div>

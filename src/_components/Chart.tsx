@@ -178,14 +178,16 @@ export default function Chart({
         const [x, y, nextX, nextY] = getXY();
         const c = (x + nextX) / 2;
         const d = (y + nextY) / 2;
-        console.log(x, y, c, d);
-        ctx.quadraticCurveTo(x, y, c, d);
-        if (i % 100 === 0) {
-          ctx.fillText(y.toString(), x, y - 10);
+        if (x > i) {
+          ctx.quadraticCurveTo(x, y, c, d);
         }
+        // if (i % 100 === 0) {
+        //   ctx.fillText(y.toString(), x, y - 10);
+        // }
       }
-      const [x, y, nextX, nextY] = getXY();
-      ctx.quadraticCurveTo(x, y, nextX, nextY);
+      // const [x, y, nextX, nextY] = getXY();
+      // console.log(x, y, nextX, nextY);
+      // ctx.quadraticCurveTo(x, y, nextX, nextY);
       ctx.strokeStyle = config.background.strokeColor ?? 'black';
       ctx.lineWidth = config.grid.lineWidth ?? 1;
       ctx.shadowBlur = config.grid.strokeGlowAmount ?? 5;
